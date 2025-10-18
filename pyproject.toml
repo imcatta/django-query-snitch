@@ -1,0 +1,16 @@
+[project]
+name = "django-query-snitch"
+version = "0.1.0"
+description = "Detect N+1 query problems in Django"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Andrea Cattaneo", email = "andrea@cattaneo.dev"},
+]
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.1",
+]
