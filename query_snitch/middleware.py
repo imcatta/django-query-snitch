@@ -46,5 +46,5 @@ def n_plus_one_detector(get_response):
             )
             response["x-n-plus-one-queries"] = "true"
         return response
-    
+
     return middleware
