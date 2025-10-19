@@ -1,5 +1,6 @@
 import functools
 import logging
+from asgiref.sync import iscoroutinefunction
 
 from django.conf import settings
 
@@ -34,19 +35,21 @@ def n_plus_one_threshold(threshold: int):
 
     def decorator(view_func):
         @functools.wraps(view_func)
-        def wrapper(*args, **kwargs):
-            response = view_func(*args, **kwargs)
-            response.n_plus_one_threshold = threshold
+        async def async_wrapper(*args, **kwargs):
+            response = await view_func(*args, **kwargs)
+            setattr(response, "n_plus_one_threshold", threshold)
             return response
 
-        return wrapper
+        @functools.wraps(view_func)
+        def sync_wrapper(*args, **kwargs):
+            response = view_func(*args, **kwargs)
+            setattr(response, "n_plus_one_threshold", threshold)
+            return response
+
+        return async_wrapper if iscoroutinefunction(view_func) else sync_wrapper
 
     def noop_decorator(view_func):
-        @functools.wraps(view_func)
-        def wrapper(*args, **kwargs):
-            return view_func(*args, **kwargs)
-
-        return wrapper
+        return view_func
 
     middleware_list = getattr(settings, "MIDDLEWARE", [])
     is_active = "query_snitch.middleware.n_plus_one_detector" in middleware_list
